@@ -1,0 +1,26 @@
+--- defaults/initrd.scripts	2017-09-07 13:44:08.000000000 -0400
++++ defaults/initrd.scripts.new	2017-10-01 03:20:53.031388499 -0400
+@@ -1072,7 +1072,7 @@
+ 		then
+ 			good_msg "Importing ZFS pools"
+ 
+-			/sbin/zpool import -N -a ${ZPOOL_FORCE}
++			/sbin/zpool import -N -a -d /dev/disk/by-id ${ZPOOL_FORCE}
+ 
+ 			if [ "$?" = '0' ]
+ 			then
+@@ -1090,12 +1090,12 @@
+ 				then
+ 					good_msg "LUKS detected. Reimporting ${ZFS_POOL}"
+ 					/sbin/zpool export -f "${ZFS_POOL}"
+-					/sbin/zpool import -N ${ZPOOL_FORCE} "${ZFS_POOL}"
++					/sbin/zpool import -N -d /dev/disk/by-id ${ZPOOL_FORCE} "${ZFS_POOL}"
+ 				fi
+ 			else
+ 				good_msg "Importing ZFS pool ${ZFS_POOL}"
+ 
+-				/sbin/zpool import -N ${ZPOOL_FORCE} "${ZFS_POOL}"
++				/sbin/zpool import -N -d /dev/disk/by-id ${ZPOOL_FORCE} "${ZFS_POOL}"
+ 
+ 				if [ "$?" = '0' ]
+ 				then
