@@ -1,0 +1,32 @@
+# HG changeset patch
+# User Jeff Gilbert <jgilbert@mozilla.com>
+# Date 1500496509 25200
+# Node ID 4a5185552a077c47ca1274266e4fe9662e1f6432
+# Parent  71ee6c0f02ff2a936d0d6c6fdb20d7d23d6cf063
+Bug 1382358 - Allow unusual/spurious glsl versions in non-DEBUG builds. - r=kvark
+
+MozReview-Commit-ID: GbJb9ankCGl
+
+
+diff --git a/dom/canvas/WebGLShaderValidator.cpp b/dom/canvas/WebGLShaderValidator.cpp
+--- a/dom/canvas/WebGLShaderValidator.cpp
++++ b/dom/canvas/WebGLShaderValidator.cpp
+@@ -114,17 +114,17 @@ ShaderOutput(gl::GLContext* gl)
+         case 330: return SH_GLSL_330_CORE_OUTPUT;
+         case 400: return SH_GLSL_400_CORE_OUTPUT;
+         case 410: return SH_GLSL_410_CORE_OUTPUT;
+         case 420: return SH_GLSL_420_CORE_OUTPUT;
+         case 430: return SH_GLSL_430_CORE_OUTPUT;
+         case 440: return SH_GLSL_440_CORE_OUTPUT;
+         case 450: return SH_GLSL_450_CORE_OUTPUT;
+         default:
+-            MOZ_CRASH("GFX: Unexpected GLSL version.");
++            MOZ_ASSERT(false, "GFX: Unexpected GLSL version.");
+         }
+     }
+ 
+     return SH_GLSL_COMPATIBILITY_OUTPUT;
+ }
+ 
+ webgl::ShaderValidator*
+ WebGLContext::CreateShaderValidator(GLenum shaderType) const
