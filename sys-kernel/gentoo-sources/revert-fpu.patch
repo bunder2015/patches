@@ -1,0 +1,62 @@
+--- linux-4.19.44-gentoo/arch/x86/include/asm/efi.h	2019-05-22 19:00:01.682098617 -0400
++++ linux-4.19.44-gentoo.new/arch/x86/include/asm/efi.h	2019-05-22 19:02:42.832558783 -0400
+@@ -40,6 +40,8 @@
+ 
+ #define arch_efi_call_virt_setup()					\
+ ({									\
++	preempt_disable();						\
++	__kernel_fpu_begin();						\
+ 	kernel_fpu_begin();						\
+ 	firmware_restrict_branch_speculation_start();			\
+ })
+@@ -98,7 +100,9 @@
+ 		efi_switch_mm(efi_scratch.prev_mm);			\
+ 									\
+ 	firmware_restrict_branch_speculation_end();			\
++	__kernel_fpu_end();						\
+ 	kernel_fpu_end();						\
++	preempt_enable();						\
+ })
+ 
+ extern void __iomem *__init efi_ioremap(unsigned long addr, unsigned long size,
+--- linux-4.19.44-gentoo/arch/x86/include/asm/fpu/api.h	2019-05-22 19:00:01.682098617 -0400
++++ linux-4.19.44-gentoo.new/arch/x86/include/asm/fpu/api.h	2019-05-22 19:05:05.651100103 -0400
+@@ -18,6 +18,8 @@
+  * If you intend to use the FPU in softirq you need to check first with
+  * irq_fpu_usable() if it is possible.
+  */
++extern void __kernel_fpu_begin(void);
++extern void __kernel_fpu_end(void);
+ extern void kernel_fpu_begin(void);
+ extern void kernel_fpu_end(void);
+ extern bool irq_fpu_usable(void);
+--- linux-4.19.44-gentoo/arch/x86/kernel/fpu/core.c	2019-05-22 19:00:01.683098613 -0400
++++ linux-4.19.44-gentoo.new/arch/x86/kernel/fpu/core.c	2019-05-22 19:07:56.514612198 -0400
+@@ -93,7 +93,7 @@
+ }
+ EXPORT_SYMBOL(irq_fpu_usable);
+ 
+-static void __kernel_fpu_begin(void)
++void __kernel_fpu_begin(void)
+ {
+ 	struct fpu *fpu = &current->thread.fpu;
+ 
+@@ -111,8 +111,9 @@
+ 		__cpu_invalidate_fpregs_state();
+ 	}
+ }
++EXPORT_SYMBOL(__kernel_fpu_begin);
+ 
+-static void __kernel_fpu_end(void)
++void __kernel_fpu_end(void)
+ {
+ 	struct fpu *fpu = &current->thread.fpu;
+ 
+@@ -121,6 +122,7 @@
+ 
+ 	kernel_fpu_enable();
+ }
++EXPORT_SYMBOL(__kernel_fpu_end);
+ 
+ void kernel_fpu_begin(void)
+ {
