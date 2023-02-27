@@ -1,0 +1,33 @@
+From cdf43ad640546dd51f18415b7d47fa7d95747e1f Mon Sep 17 00:00:00 2001
+From: Hans de Graaff <hans@degraaff.org>
+Date: Wed, 13 Jul 2022 18:44:48 -0400
+Subject: [PATCH] Remove unused SYS variable
+
+Sysctl is not actually used in the script so remove the associated
+variable to avoid confusion about the dependencies of the script.
+Note that sysctl is not consistely installed as /sbin/sysctl, e.g. on
+Gentoo Linux it is installed as /usr/sbin/sysctl.
+
+Authored-by: Hans de Graaff <hans@degraaff.org>
+Signed-off-by: bunder2015 <omfgbunder@gmail.com>
+---
+ zfs_stats_ | 6 ------
+ 1 file changed, 6 deletions(-)
+
+diff --git a/zfs_stats_ b/zfs_stats_
+index 0e0e1e9..0caf029 100755
+--- a/zfs_stats_
++++ b/zfs_stats_
+@@ -17,12 +17,6 @@
+ 
+ FUNCTION=$(basename $0 | cut -d_ -f3)
+ BC='/usr/bin/bc -q'
+-SYS='/sbin/sysctl -n'
+-
+-#
+-# Sysctl macros
+-#
+-
+ 
+ CONTENT=`cat /proc/spl/kstat/zfs/arcstats`
+ 
