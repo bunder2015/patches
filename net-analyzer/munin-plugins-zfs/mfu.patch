@@ -1,6 +1,25 @@
---- a/zfs_stats_	2017-01-26 20:40:22.000000000 -0500
-+++ b/zfs_stats_	2017-10-29 15:56:25.713120469 -0400
-@@ -46,7 +46,8 @@
+From d22a2f891774a51283db049dd16eea95335e5668 Mon Sep 17 00:00:00 2001
+From: Jan Lam <jan@janlamda.nl>
+Date: Wed, 13 Jul 2022 18:40:56 -0400
+Subject: [PATCH] Get MRU_SIZE and MFU_SIZE from the appropriate variables in
+ arcstats.
+
+MFU_SIZE is available in arcstats, so there is no need to assume
+$size - $mru_size = $mfu_size.
+MRU_SIZE is available as the mru_size variable in arcstats. If I understand
+correctly, the 'p' variable is actually the target MRU_SIZE.
+
+Authored-by: Jan Lam <jan@janlamda.nl>
+Signed-off-by: bunder2015 <omfgbunder@gmail.com>
+---
+ zfs_stats_ | 9 ++-------
+ 1 file changed, 2 insertions(+), 7 deletions(-)
+
+diff --git a/zfs_stats_ b/zfs_stats_
+index 6dc2ccd..0e0e1e9 100755
+--- a/zfs_stats_
++++ b/zfs_stats_
+@@ -46,7 +46,8 @@ PREFETCH_METADATA_HITS=`echo "$CONTENT" | grep "^prefetch_metadata_hits" | awk '
  PREFETCH_METADATA_MISSES=`echo "$CONTENT" | grep "^prefetch_metadata_misses" | awk '{print $3;}'`
  
  SIZE=`echo "$CONTENT" | grep "^size" | awk '{print $3;}'`
@@ -10,7 +29,7 @@
  MAX_SIZE=`echo "$CONTENT" | grep "^c_max" | awk '{print $3;}'`
  MIN_SIZE=`echo "$CONTENT" | grep "^c_min" | awk '{print $3;}'`
  TARGET_SIZE=`echo "$CONTENT" | grep "^c\s" | awk '{print $3;}'`
-@@ -88,12 +89,6 @@
+@@ -88,12 +89,6 @@ DEMAND_METADATA_MISS_PERC=`echo "scale=2 ; (100*$DEMAND_METADATA_MISSES/$ARC_MIS
  PREFETCH_METADATA_HIT_PERC=`echo "scale=2 ; (100*$PREFETCH_METADATA_HITS/$ARC_HITS)" | $BC`
  PREFETCH_METADATA_MISSES_PERC=`echo "scale=2 ; (100*$PREFETCH_METADATA_MISSES/$ARC_MISSES)" | $BC`
  
